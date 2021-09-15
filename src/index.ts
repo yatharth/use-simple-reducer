@@ -1,16 +1,16 @@
 import {useReducer} from "react"
 import {createSlice, PayloadAction} from "@reduxjs/toolkit"
-import {Actions, ActionWithArgumentsApplied, ReturnedActions, ReturnedSelectors, Selectors} from './types'
+import {Actions, ActionWithArgumentsApplied, ReturnedActions, ReturnedSelectors, Selectors, Options} from './types'
 
-export type {Actions, Selectors}
+export type {Options}
 
-const useSimpleReducer =
+export const useSimpleReducer =
     // By using "SpecificActions extends Actions<State>", it narrows to the specific action names and types involved.
     // Same with "SpecificSelectors extends Selectors<State>".
     <State, SpecificActions extends Actions<State>, SpecificSelectors extends Selectors<State>>
         // TODO: The "as SpecificSelectors" type assertion is a bit sketch. There must be a better way of making "selectors" optional.
         // Right now, the consequence is that when selectors is not passed, then returnedSelectors is of a too wide type, that can be destructured into anything.
-    (initialState: State, actions: SpecificActions, selectors: SpecificSelectors = {} as SpecificSelectors) => {
+    ({initialState, reducers: actions, selectors}: Options<State, SpecificActions, SpecificSelectors>) => {
 
         const slice = createSlice({
             name: "__name",
@@ -36,5 +36,3 @@ const useSimpleReducer =
         // The “as const” narrows to the specific keys and types involved.
         return [state, returnedActions, returnedSelectors] as const
     }
-
-export default useSimpleReducer

@@ -18,3 +18,7 @@ export type Selectors<State> = {
 export type ReturnedSelectors<SpecificSelectors extends Selectors<any>> = {
     [key in keyof SpecificSelectors]: (...selectorArgs: Parameters<SpecificSelectors[key]>) => (SpecificSelectors[key] extends ((...selectorArgs: any[]) => (state: any) => infer P) ? P : never)
 }
+
+export type Options<State, SpecificActions extends Actions<State>, SpecificSelectors extends Selectors<State>> = {
+    initialState: State, reducers: SpecificActions, selectors: SpecificSelectors
+}
