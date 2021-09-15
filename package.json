@@ -1,6 +1,6 @@
 {
   "name": "use-simple-reducer",
-  "version": "0.0.0-development",
+  "version": "0.1.0",
   "repository": "https://github.com/yatharth/use-simple-reducer.git",
   "author": "Yatharth Agarwal <yatharth999@gmail.com>",
   "license": "MIT",
@@ -8,14 +8,13 @@
   "files": ["/build/"],
   "scripts": {
     "build": "rm -rf build/* && tsc --declaration",
-    "prepare": "npm run build",
+    "prepack": "npm run build",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "1.5.1",
     "@types/react": "^17.0.3",
     "react": "17.0.2",
-    "semantic-release": "^17.4.2",
     "typescript": "^4.0.5"
   },
   "peerDependencies": {

@@ -1,15 +1,47 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
+
+    /* Configuration options. */
+
+    // What to emit in.
+    "target": "es2018",
+
+    // What polyfills to include.
+    // "esnext" includes the latest everything. "dom" includes stuff used by things like @reduxjs/toolkit typings.
+    "lib": ["dom", "esnext"],
+
+
+    /* Modules options. */
+
+    // The module structure to use.
+    "module": "commonjs",
+
+    // Already the default.
+    // "moduleResolution": "node",
+
+    // Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports.
+    // Implies 'allowSyntheticDefaultImports'.
     "esModuleInterop": true,
+
+
+    /* Build & emit options. */
+
+    "outDir": "build",
     "declaration": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    // "sourceMap": true,
+
+
+    /* Strictness options. */
+
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "build",
-    "strict": true,
-    "target": "es2018"
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true
+
   },
   "include": ["src"],
   "exclude": ["src/*.test.ts"]
