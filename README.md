@@ -1,6 +1,6 @@
 # useSimpleReducer
 
-`useSimpleReducer` is the **most boilerplate-free way** to use state within a React component.
+`useSimpleReducer` is the **most boilerplate-free way possible** to use reducers within a React component.
 
 Here’s a code example
 
@@ -37,8 +37,9 @@ Compare this with using:
 - `useReducer` with Redux Toolkit
 - [`useComplexState`][use-complex-state]
 
-See the code comparison snippets below.
+Code snippet comparisons are made below.
 
+The point is to make it easy & light-weight to work with state using the [Commands and Queries][Command-Query] design pattern—state is always modified through an explicit Command function, and accessed through a Query function..
 
 
 ## Usage
@@ -60,9 +61,11 @@ Now you can use `useSimpleReducer` in components like this:
 ```typescript jsx
 import {useSimpleReducer} from 'use-simple-reducer'
 
-const Counter = () => {
+const TextDoubler = () => {
 
-    const initialState = {text: ""}
+    const initialState = {
+        text: ""
+    }
     const [state, {append, replace}, {doubled}] = useSimpleReducer({
         initialState,
         reducers: {
@@ -115,7 +118,7 @@ that returns a computed value based on `state`.
 
 ### Typing
 
-useSimpleReducer is fully typed. In the above code, Typescript will automatically infer that the type of the `(state)` parameter in your reducers and selectors is `{text: string}`.
+`useSimpleReducer` is fully typed. In the above code, Typescript will automatically infer that the type of the `(state)` parameter in your reducers and selectors is `{text: string}`.
 
 If you want to be explicit about the State type, you can either use a type assertion:
 
@@ -168,7 +171,7 @@ You can pull out the `useSimpleReducer(...)` code into your own custom hook, to 
 ```typescript jsx
 import {useSimpleReducer} from 'use-simple-reducer'
 
-const useCounter = () => {
+const useTextDoubler = () => {
     
     const initialState = {text: ""}
     const reducers = {
@@ -182,9 +185,9 @@ const useCounter = () => {
     return useSimpleReducer({initialState, reducers, selectors})
 }
 
-const Counter = () => {
+const TextDoubler = () => {
 
-    const [state, {append, replace}, {doubled}] = useCounter()
+    const [state, {append, replace}, {doubled}] = useTextDoubler()
 
     return <div>
         <p>Text: {state.text}</p>
@@ -196,13 +199,157 @@ const Counter = () => {
 ```
 
 
-## Why this exists
+## Comparison with alternatives
 
-TO BE WRITTEN
+Consider the following code snippet written with `useSimpleReducer`
+
+```typescript jsx
+import {useSimpleReducer} from 'use-simple-reducer'
+
+const TodosApp = () => {
+
+    type State = { todos: string[] }
+    const initialState: State = { todos: [] }
+    
+    const [state, {addTodo, setNthTodo}] = useSimpleReducer({
+        initialState,
+        reducers: {
+            addTodo: () => (state) => { state.todos.push(todo) },
+            setNthTodo: (index: number, todo: string) => (state) => { state.todos[index] = todo },
+        }, selectors: {
+            lastTodo: () => (state) => (state.todos.at(-1))
+        }
+    })
+    
+    return <div>
+        <ol>
+            {state.todos.map((todo, i) => (<li key={i}>
+                <input value={todo} onChange={(event) => setNthTodo(i, event.target.value)} />
+            </li>))}
+        </ol>
+        <button onClick={() => addTodo()}>Add todo</button>
+    </div>
+}
+```
+
+---
+
+If it was written with `useReducer` and Redux Toolkit, it would look like: 
+
+```typescript jsx
+import {useReducer} from 'react'
+import {createSlice} from '@reduxjs/toolkit'
+
+const TodosApp = () => {
+
+    type State = { todos: string[] }
+    const initialState: State = { todos: [] }
+
+    const slice = createSlice({
+        name: "todos",
+        initialState,
+        reducers: {
+            addTodo: (state) => { state.todos.push(todo) },
+            setNthTodo: (state, index: number, todo: string) => { state.todos[i] = todo },
+        },
+    })
+    
+    const [state, dispatch] = useReducer(slice.reducer)
+    
+    return <div>
+        <ol>
+            {state.todos.map((todo, i) => (<li key={i}>
+                <input value={todo} onChange={(event) => dispatch(slice.actions.setNthTodo({index: i, todo: event.target.value}))} />
+            </li>))}
+        </ol>
+        <button onClick={() => dispatch(slice.actions.addTodo())}>Add todo</button>
+    </div>
+}
+```
+
+Notice the improvements with `useSimpleReducer`:
+
+1. There’s no need for a `name` field. Since we are not combining multiple slices together, like you would with redux, this is just unnecessary noise.
+2. You pass `initialState` just once, and you can define it inline.
+3. No need to wrap the actions with dispatches. That wrapping is ugly, noisy, and easy to mess up (no warning if you call the action without a dispatch—might be a confusing bug to debug).
+4. The actions (and selectors, if any) are returned right there in an easy to capture way.
+5. When actions take multiple arguments, you can pass them in naturally, like `setNthTodo(i, event.target.value)`, instead of having to wrap them in an object like `setNthTodo({index: i, todo: event.target.value})`. This is also nice, because if you use IDE refactoring tools, they will rename the parameters correctly in the first case, but might miss the second.
+6. Built in functionality for selectors.
+
+---
+
+If the code snippet was written with `useComplexState` (a similar library to help reduce boilerplate), it would look like:
+
+```typescript jsx
+import {useComplexState} from 'use-complex-state'
+
+const TodosApp = () => {
+
+    type State = { todos: string[] }
+    const initialState: State = { todos: [] }
+    
+    const [state, {addTodo, setNthTodo}] = useComplexState({
+        initialState,
+        reducers: {
+            addTodo: (state) => { state.todos.push(todo) },
+            setNthTodo: (state, index: number, todo: string) => { state.todos[index] = todo },
+        },
+    })
+    
+    return <div>
+        <ol>
+            {state.todos.map((todo, i) => (<li key={i}>
+                <input value={todo} onChange={(event) => setNthTodo({index: i, todo: event.target.value})} />
+            </li>))}
+        </ol>
+        <button onClick={() => addTodo()}>Add todo</button>
+    </div>
+}
+```
+
+While points 1–4 are addressed, points 5–6 are not.
+
+---
+
+If the code snippet was written with `useState`, it might look like:
+
+```typescript jsx
+import {produce} from 'immer'
+
+const TodosApp = () => {
+
+    type State = { todos: string[] }
+    const initialState: State = { todos: [] }
+    
+    const [state, setState] = useState(initialState)
+    const addTodo = () => {
+        setState(produce(state, (draft) => { state.todos.push(todo) }))
+    }
+    const setNthTodo = (index: number, todo: string) => {
+        setState(produce(state, (draft) => { state.todos[index] = todo }))
+    }
+    const lastTodo = () => (state.todos.at(-1))
+    
+    return <div>
+        <ol>
+            {state.todos.map((todo, i) => (<li key={i}>
+                <input value={todo} onChange={(event) => setNthTodo(i, event.target.value)} />
+            </li>))}
+        </ol>
+        <button onClick={() => addTodo()}>Add todo</button>
+    </div>
+}
+```
+
+In React, it’s important not to mutate state directly, but rather to use `setState`. Thus, you would either have to wrap your action function with `produce(...)` from [Immer][], or make sure it doesn’t accidentally mutate the state. This is noisy and easy to get wrong (can lead to difficult to debug behaviours).
+
+In comparison, `useSimpleReducer` makes it clean and safe to work with state. It also groups together the functionality around a bit of state in a convenient way.
+
 
 
 [useReducer]: https://reactjs.org/docs/hooks-reference.html#usereducer
 [Redux Toolkit]: https://redux-toolkit.js.org
 [use-complex-state]: https://github.com/xolvio/use-complex-state
 [Immer]: https://immerjs.github.io/immer/
+[Command-Query]: https://khalilstemmler.com/articles/oop-design-principles/command-query-separation/ 
 

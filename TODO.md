@@ -5,9 +5,10 @@ These are separate from the `// TODO` comments sprinkled throughout the code.
 
 ## TODOs to consider
 
-- Write README
-- Expose way to create reducer
-- Announce on Twitter (including how Typescript adds so much development time)
+- Proofread README
+- Add more comments to source
+- Expose way to create reducer for testing purposes
+- Look into draft-safe selectors (https://redux-toolkit.js.org/api/createSelector)
 
 
 ## TODOs I’m not going to do

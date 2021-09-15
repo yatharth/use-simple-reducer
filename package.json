@@ -1,6 +1,7 @@
 {
   "name": "use-simple-reducer",
   "version": "0.1.0",
+  "homepage": "https://github.com/yatharth/use-simple-reducer",
   "repository": "https://github.com/yatharth/use-simple-reducer.git",
   "author": "Yatharth Agarwal <yatharth999@gmail.com>",
   "license": "MIT",
